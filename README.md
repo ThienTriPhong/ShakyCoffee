@@ -2,36 +2,54 @@
 
 ## Project Description
 
-The Shaky Coffee Order System is a Python application created for an imaginary Vietnamese local coffee shop. It allows a user to enter a customer name, select menu items and quantities, calculate the total cost, and display a completed order summary.
+The Shaky Coffee Order System is a Python application created for an imaginary Vietnamese local coffee shop. It allows a user to enter customer orders, calculate totals, and organize placed orders in a first-come-first-served waiting list.
 
-## Current Features
+The system was created with Python and Tkinter and is designed to provide a simple, user-friendly interface for coffee shop order management.
+
+## Final Features
 
 - Graphical interface created with Tkinter
 - Customer name entry
-- Menu item selection
-- Quantity selection
-- Add items to an order
+- Menu items with displayed prices
+- Quantity selection from 1 to 10
+- Add items to a current order
+- Combine repeated menu items
 - Automatic total calculation
-- Completed order summary
-- Clear order option
-- Input validation
-- Exit option
+- Current-order summary
+- Input validation and warning messages
+- Clear the current order
+- Place orders into a waiting list
+- Assign a unique number to each order
+- Display customer names and order details
+- Complete orders in first-come-first-served order
+- Exit confirmation
+- Status messages
 
 ## Classes
 
 The system contains three main classes:
 
-1. Customer
-2. MenuItem
-3. Order
+### Customer
+
+Stores the customer's name and provides a method for retrieving it.
+
+### MenuItem
+
+Stores each menu item's name, price, and category. It also provides a method for displaying the item with its price.
+
+### Order
+
+Stores selected menu items and quantities. It combines repeated items, calculates totals, produces order summaries, creates order details, and clears the current order.
 
 ## Python Collections
 
 The program uses:
 
 - A list to store available menu items
-- A list to store selected order items
-- Dictionaries to connect each selected item with its quantity
+- A list to store items in the current order
+- Dictionaries to connect menu items with quantities
+- A list to store waiting orders
+- Dictionaries to store each waiting order's number, customer name, and order details
 
 ## How to Run the Program
 
@@ -44,6 +62,25 @@ The program uses:
 python main.py
 ```
 
+Tkinter is included with most standard Python installations, so no additional packages are required.
+
+## Documentation
+
+- [Project Proposal](Project_Proposal.md)
+- [Final Report and Test Results](Final_Report.md)
+- [UML Class Diagram](UML_Diagram.png)
+- [Sample Output Screenshots](screenshots/)
+
+## Sample Output
+
+### Current Order
+
+![Current Order](screenshots/02_Current_Order.png)
+
+### Waiting Orders
+
+![Waiting Orders](screenshots/03_Waiting_Orders.png)
+
 ## Project Status
 
-The initial working version is complete. The next steps are additional testing, documentation, a UML class diagram, and sample output.
+The final version of the Shaky Coffee Order System is complete. The system was tested successfully and ran without syntax or runtime errors. All planned order-entry, calculation, validation, waiting-list, and first-come-first-served processing features are working.
