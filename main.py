@@ -19,6 +19,12 @@ menu_items = [
 # Create an empty order.
 current_order = Order()
 
+# Store orders that are waiting to be prepared.
+placed_orders = []
+
+# Give every placed order a unique number.
+next_order_number = 1
+
 
 def find_menu_item(display_text):
     """Find a menu item using the text shown in the menu."""
@@ -49,12 +55,48 @@ def update_order_display():
     total = current_order.calculate_total()
     total_label.config(text=f"Total: ${total:.2f}")
 
+def update_waiting_orders_display():
+    """Display all waiting orders in first-come-first-served order."""
+
+    waiting_listbox.delete(0, tk.END)
+
+    if len(placed_orders) == 0:
+        waiting_listbox.insert(
+            tk.END,
+            "No orders are currently waiting."
+        )
+        return
+
+    for order in placed_orders:
+        display_text = (
+            f"Order #{order['order_number']} | "
+            f"{order['customer_name']} | "
+            f"{order['order_details']}"
+        )
+
+        waiting_listbox.insert(
+            tk.END,
+            display_text
+        )
+
 
 def reset_quantity():
     """Reset the quantity box to 1."""
 
     quantity_spinbox.delete(0, tk.END)
     quantity_spinbox.insert(0, "1")
+
+def reset_current_order_form():
+    """Clear the current order without clearing the waiting list."""
+
+    current_order.clear_order()
+
+    customer_entry.delete(0, tk.END)
+    menu_combobox.current(0)
+    reset_quantity()
+    update_order_display()
+
+    customer_entry.focus()
 
 
 def add_to_order():
@@ -110,7 +152,9 @@ def add_to_order():
 
 
 def place_order():
-    """Display the completed customer order."""
+    """Add the current order to the waiting list."""
+
+    global next_order_number
 
     customer_name = customer_entry.get().strip()
 
@@ -130,38 +174,72 @@ def place_order():
         return
 
     customer = Customer(customer_name)
+    order_number = next_order_number
 
-    order_summary = (
-        f"Customer: {customer.get_name()}\n\n"
-        f"{current_order.get_order_summary()}\n"
-        f"Total: ${current_order.calculate_total():.2f}"
-    )
+    placed_order = {
+        "order_number": order_number,
+        "customer_name": customer.get_name(),
+        "order_details": current_order.get_order_details()
+    }
+
+    placed_orders.append(placed_order)
+    next_order_number += 1
+
+    update_waiting_orders_display()
 
     messagebox.showinfo(
-        "Order Complete",
-        order_summary
+        "Order Added",
+        (
+            f"Order #{order_number} for {customer.get_name()} "
+            "has been added to the waiting list."
+        )
     )
 
+    reset_current_order_form()
+
     status_label.config(
-        text="The order was completed successfully."
+        text=f"Order #{order_number} was added to the waiting list."
     )
 
 
 def clear_order():
-    """Clear the order and reset all input fields."""
+    """Clear only the order currently being entered."""
 
-    current_order.clear_order()
-
-    customer_entry.delete(0, tk.END)
-    menu_combobox.current(0)
-    reset_quantity()
-    update_order_display()
+    reset_current_order_form()
 
     status_label.config(
-        text="The order form has been cleared."
+        text="The current order form has been cleared."
     )
 
-    customer_entry.focus()
+def complete_next_order():
+    """Complete and remove the oldest waiting order."""
+
+    if len(placed_orders) == 0:
+        messagebox.showwarning(
+            "No Waiting Orders",
+            "There are no waiting orders to complete."
+        )
+        return
+
+    # Index 0 is the first order that was placed.
+    completed_order = placed_orders.pop(0)
+
+    update_waiting_orders_display()
+
+    messagebox.showinfo(
+        "Order Completed",
+        (
+            f"Order #{completed_order['order_number']} for "
+            f"{completed_order['customer_name']} has been completed."
+        )
+    )
+
+    status_label.config(
+        text=(
+            f"Order #{completed_order['order_number']} "
+            "was completed."
+        )
+    )
 
 
 def confirm_exit():
@@ -179,8 +257,8 @@ def confirm_exit():
 # Create the main window.
 window = tk.Tk()
 window.title("Shaky Coffee Order System")
-window.geometry("680x740")
-window.minsize(650, 700)
+window.geometry("780x880")
+window.minsize(720, 820)
 window.configure(bg="#f4eadf")
 window.protocol("WM_DELETE_WINDOW", confirm_exit)
 
@@ -398,7 +476,7 @@ summary_frame.pack(
 order_text = tk.Text(
     summary_frame,
     width=55,
-    height=9,
+    height=6,
     font=("Consolas", 11),
     state="disabled",
     wrap="word"
@@ -482,8 +560,49 @@ exit_button.grid(
     padx=6
 )
 
-# Display the empty order message.
+# Waiting-order section.
+waiting_frame = tk.LabelFrame(
+    content_frame,
+    text="Waiting Orders - First Come, First Served",
+    font=("Arial", 11, "bold"),
+    bg="#f4eadf",
+    padx=12,
+    pady=12
+)
+waiting_frame.pack(
+    fill="both",
+    expand=True,
+    pady=(12, 0)
+)
+
+waiting_listbox = tk.Listbox(
+    waiting_frame,
+    height=6,
+    font=("Arial", 10)
+)
+waiting_listbox.pack(
+    fill="both",
+    expand=True
+)
+
+complete_next_button = tk.Button(
+    waiting_frame,
+    text="Complete Next Order",
+    width=20,
+    font=("Arial", 10, "bold"),
+    bg="#5f7f5f",
+    fg="white",
+    command=complete_next_order
+)
+complete_next_button.pack(
+    pady=(10, 0)
+)
+
+# Display the empty current order.
 update_order_display()
+
+# Display the empty waiting list.
+update_waiting_orders_display()
 
 # Move the cursor to the customer name field.
 customer_entry.focus()

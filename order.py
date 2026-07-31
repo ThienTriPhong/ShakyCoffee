@@ -44,5 +44,19 @@ class Order:
 
         return summary
 
+    def get_order_details(self):
+        # Create a short description without displaying prices.
+        details = []
+
+        for order_item in self.items:
+            item = order_item["item"]
+            quantity = order_item["quantity"]
+
+            details.append(
+                f"{item.name} x{quantity}"
+            )
+
+        return ", ".join(details)
+
     def clear_order(self):
         self.items.clear()
