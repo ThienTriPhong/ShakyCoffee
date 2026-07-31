@@ -4,6 +4,13 @@ class Order:
         self.items = []
 
     def add_item(self, menu_item, quantity):
+        # Check whether the item is already in the order.
+        for order_item in self.items:
+            if order_item["item"].name == menu_item.name:
+                order_item["quantity"] += quantity
+                return
+
+        # Add a new item when it is not already in the order.
         order_item = {
             "item": menu_item,
             "quantity": quantity
